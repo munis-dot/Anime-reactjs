@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "../../axios";
 import { PopUpContext } from "../../Context/moviePopUpContext";
 import { Fade } from "react-reveal";
 import StarRatings from "react-star-ratings";
 import MoviePopUp from "../PopUp/MoviePopUp";
 import usePlayMovie from "../../CustomHooks/usePlayMovie";
-import { getTrendingMovies } from "@/lib/utils";
+import { getMoviesByCategory, getTrendingMovies } from "@/lib/utils";
+import { premiumUrl } from "@/Constants/Constance";
 
 function Banner(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
@@ -24,7 +24,6 @@ function Banner(props) {
 
   const [windowSeize, setWindowSeize] = useState(getWindowSize())
 
-
   useEffect(() => {
     if (props.url === 'trending') {
       getTrendingMovies().then((movies) => {
@@ -32,16 +31,10 @@ function Banner(props) {
       });
     }
     else {
-      axios.get(props.url).then((response) => {
-        setMovie(
-          response.data.results.sort(function (a, b) {
-            return 0.5 - Math.random();
-          })[0]
-        );
-        console.log(movie);
+      getMoviesByCategory(props.url).then((movies) => {
+        setMovie(movies[Math.floor(Math.random() * movies.length)]);
       });
     }
-
 
     function handleWindowResize() {
       setWindowSeize(getWindowSize())
@@ -58,17 +51,6 @@ function Banner(props) {
   const handleMoviePopup = (movieInfo) => {
     setMoviePopupInfo(movieInfo);
     setShowModal(true);
-
-    // axios
-    //   .get(`/movie/${movieInfo.id}/movies?api_key=${API_KEY}&language=en-US`)
-    //   .then((responce) => {
-    //     console.log(responce.data);
-    //     if (responce.data.results.length !== 0) {
-    //       setUrlId(responce.data.results[0]);
-    //     } else {
-    //       console.log("Array Emptey");
-    //     }
-    //   });
   };
 
   return (
@@ -76,8 +58,8 @@ function Banner(props) {
       <div
         style={{
           backgroundImage: `linear-gradient(90deg, hsl(0deg 0% 7% / 91%) 0%, hsl(0deg 0% 0% / 0%) 35%, hsl(220deg 26% 44% / 0%) 100%), url(${movie
-              ? movie.thumbnailUrl
-              : ""
+            ? movie.thumbnailUrl
+            : ""
             })`,
         }}
         className="h-[50rem] md:h-[55rem] 3xl:h-[63rem] bg-cover bg-center object-contain grid items-center"
@@ -95,7 +77,6 @@ function Banner(props) {
                 <div className="animate-pulse w-72 ml-4 sm:ml-0 sm:w-96 py-5 mb-7 xl:py-7 xl:w-45rem bg-neutral-900 rounded-md"></div>
               </div>
             )}
-
 
             <div className="flex">
               <div className=" hidden sm:flex justify-center sm:justify-start ml-2">
@@ -129,6 +110,9 @@ function Banner(props) {
             </div>
 
             <div className="mt-3 mb-4">
+              {movie.premium && <><h1 className="text-white text-xl p-2 rounded mb-4 flex gap-2 items-center">
+                <img className="w-10 h-10 rounded-md cursor-pointer" src={premiumUrl}></img> Premium Content
+              </h1></>}
               {movie.overview ? (
                 <>
                   <h1 className="text-white text-xl drop-shadow-xl  text-center line-clamp-2 sm:line-clamp-3 sm:text-left w-full md:w-4/5 lg:w-8/12/2 lg:text-xl xl:w-5/12 2xl:text-2xl">

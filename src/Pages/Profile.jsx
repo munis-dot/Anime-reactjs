@@ -32,7 +32,6 @@ function Profile() {
 
   useEffect(() => {
     if (User != null) {
-      console.log(User.photoURL, "hello");
       setProfilePic(User.photoURL);
       fetchDocumentById('Users', User.uid).then((res) => {
         console.log(res)
@@ -146,8 +145,8 @@ function Profile() {
                 </h1>
                 <h1 className="text-white text-xl p-2 rounded mb-4 flex gap-2 items-center">
                   <img className="w-10 h-10 rounded-md cursor-pointer" src={premiumUrl}></img>
-                  <div>{premium ? 'Premium Available' : <button
-                    onClick={() => navigate("/")}
+                  <div>{premium ? 'You\'re the Premium Member' : <button
+                    onClick={() => navigate("/payment")}
                     className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
                   >Subscribe life time access</button>}</div>
                 </h1>

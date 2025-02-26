@@ -21,6 +21,7 @@ import Loading from "./componets/Loading/Loading";
 import Navbar from "./componets/Header/Navbar";
 import NavbarWithoutUser from "./componets/Header/NavbarWithoutUser";
 import VideoUploadForm from "./Pages/VideoUpload";
+import PaymentScreen from "./componets/payment/PaymentScreen";
 
 function App() {
   const { User, setUser } = useContext(AuthContext);
@@ -49,6 +50,7 @@ function App() {
               <Route path="/mylist" element={<MyList />} />
               <Route path="/liked" element={<LikedMovies />} />
               <Route path="/history" element={<History />} />
+              <Route path="/payment" element={<PaymentScreen />} />
               <Route path="/play/:id" element={<Play />} />
             </>
           ) : null}

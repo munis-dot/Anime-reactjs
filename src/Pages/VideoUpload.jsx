@@ -244,7 +244,7 @@ const VideoUploadForm = () => {
     { value: 'top_rated', label: 'Top Rated' },
     { value: 'upcoming', label: 'Upcoming' },
     { value: 'popular', label: 'Popular' },
-    { value: 'now_playing', label: 'Now Playing' },
+    { value: 'horror', label: 'Horror' },
     { value: 'action', label: 'Action' },
     { value: 'adventure', label: 'Adventure' },
     { value: 'comedy', label: 'Comedy' },
@@ -383,6 +383,15 @@ const VideoUploadForm = () => {
 
   return (
     <div className="p-6 bg-black text-white min-h-screen flex justify-center items-center">
+      <Toaster
+        toastOptions={{
+          style: {
+            padding: "1.5rem",
+            backgroundColor: "#f4fff4",
+            borderLeft: "6px solid lightgreen",
+          },
+        }}
+      />
       <Card className="w-full max-w-2xl p-6 bg-gray-900 shadow-lg rounded-2xl">
         <h2 className="text-2xl font-bold mb-4 text-red-600">Upload Video</h2>
         <CardContent>
@@ -401,7 +410,7 @@ const VideoUploadForm = () => {
           <motion.div {...getThumbProps2()} className="border-2 border-dashed border-gray-600 p-4 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-800 mt-4">
             <input {...getThumbInputProps2()} />
             <ImageIcon size={40} className="text-gray-400 mb-2" />
-            {bannerPreview? <img src={bannerPreview} alt="Thumbnail Preview" className="mt-2 w-32 h-32 rounded-lg object-cover" /> : <p className="text-gray-400">Upload Banner (big)</p>}
+            {bannerPreview ? <img src={bannerPreview} alt="Thumbnail Preview" className="mt-2 w-32 h-32 rounded-lg object-cover" /> : <p className="text-gray-400">Upload Banner (big)</p>}
           </motion.div>
 
           <div className="mt-4 space-y-3">

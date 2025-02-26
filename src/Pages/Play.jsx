@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import StarRatings from "react-star-ratings";
 import axios from "../axios";
-import { API_KEY, imageUrl, imageUrl2 } from "../Constants/Constance";
+import { API_KEY, imageUrl, imageUrl2, premiumUrl } from "../Constants/Constance";
 
 import Navbar from "../componets/Header/Navbar";
 import Footer from "../componets/Footer/Footer";
@@ -15,7 +15,7 @@ import "swiper/css/pagination";
 import usePlayMovie from "../CustomHooks/usePlayMovie";
 import useUpdateWatchedMovies from "../CustomHooks/useUpdateWatchedMovies";
 import CloudinaryVideoPlayer from "@/componets/player/CloudinaryVideoPlayer";
-import { fetchDocumentById } from "@/lib/utils";
+import { fetchDocumentById, getDocumentByCustomId } from "@/lib/utils";
 
 function Play() {
   const [urlId, setUrlId] = useState("");
@@ -37,8 +37,8 @@ function Play() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const getMovieData = async()=>{
-    const data = await fetchDocumentById(id);
+  const getMovieData = async () => {
+    const data = await getDocumentByCustomId('movies',Number(id));
     console.log(data)
     setMovieDetails(data)
   }
@@ -54,51 +54,6 @@ function Play() {
       setIsFromWatchedMovies(true);
     }
     getMovieData();
-    // axios
-    //   .get(`/movie/${id}/movies?api_key=${API_KEY}&language=en-US`)
-    //   .then((responce) => {
-    //     console.log(responce.data, "This is the data");
-    //     if (responce.data.results.length !== 0) {
-    //       setUrlId(responce.data.results[0]);
-    //       setMoreTrailerVideos(responce.data.results);
-    //     } else {
-    //       console.log("Array Emptey");
-    //     }
-    //   });
-
-    // if (urlId === "") {
-    //   axios
-    //     .get(`/tv/${id}/movies?api_key=${API_KEY}&language=en-US`)
-    //     .then((responce) => {
-    //       if (responce.data.results.length !== 0) {
-    //         console.log(responce.data.results[0], "This is using find ");
-    //         setUrlId(responce.data.results[0]);
-    //         setMoreTrailerVideos(responce.data.results);
-    //         console.log(moreTrailerVideos);
-    //       } else {
-    //         console.log("Array Emptey");
-    //       }
-    //     });
-    // }
-    // axios
-    //   .get(`/movie/${id}?api_key=${API_KEY}&language=en-US`)
-    //   .then((responce) => {
-    //     console.log(responce.data, "Movie deatils");
-    //     setMovieDetails(responce.data);
-    //     console.log(responce.data.genres[0]);
-
-    //     axios
-    //       .get(
-    //         `movie/${id}/recommendations?api_key=${API_KEY}&language=en-US&page=1`
-    //       )
-    //       .then((res) => {
-    //         console.log(
-    //           res.data.results.slice(0, 8),
-    //           "ksdjfk ahdsfjksadhfjsdahf"
-    //         );
-    //         setSimilarMovies(res.data.results.slice(0, 8));
-    //       });
-    //   });
   }, []);
 
   return (
@@ -109,7 +64,7 @@ function Play() {
         {movieDetails.videoUrl ? (
           <CloudinaryVideoPlayer videoUrl={movieDetails.videoUrl} />
         ) : (
-          <img src={`${ movieDetails.thumbnailUrl}`} />
+          <img src={`${movieDetails.thumbnailUrl}`} />
         )}
       </div>
 
@@ -118,7 +73,7 @@ function Play() {
           {/* Movie details Section  */}
           <section
             style={{
-              backgroundImage: `linear-gradient(90deg, #000000f0 0%, #000000e6 35%, #000000c3 100%), url(${ movieDetails.thumbnailUrl
+              backgroundImage: `linear-gradient(90deg, #000000f0 0%, #000000e6 35%, #000000c3 100%), url(${movieDetails.thumbnailUrl
                 })`,
             }}
             className="bg-cover bg-center object-contain flex flex-col p-5 sm:p-14 lg:flex-row lg:items-center lg:justify-center lg:gap-8 2xl:py-24"
@@ -127,6 +82,9 @@ function Play() {
               <h1 className="text-white font-bold text-3xl mb-2">
                 {movieDetails.name || movieDetails.title}
               </h1>
+              {movieDetails.premium && <><h1 className="text-white text-xl p-2 rounded mb-4 flex gap-2 items-center">
+                <img className="w-10 h-10 rounded-md cursor-pointer" src={premiumUrl}></img> Premium Content
+              </h1></>}
               <StarRatings
                 rating={movieDetails.vote_average / 2}
                 starRatedColor="red"
@@ -347,8 +305,7 @@ function Play() {
               <img
                 src={
                   movieDetails.bannerUrl &&
-                  `${
-                  (window.innerWidth > 1024
+                  `${(window.innerWidth > 1024
                     ? movieDetails.thumbnailUrl
                       ? movieDetails.thumbnailUrl
                       : "anime.png"
@@ -376,14 +333,14 @@ function Play() {
                           <div class="max-w-sm shadow mb-4">
                             <img
                               src={
-                                similarMovie.thumbnailUrl ??"anime.png"
+                                similarMovie.thumbnailUrl ?? "anime.png"
                               }
-                            alt=""
-                            className="cursor-pointer"
-                            onClick={() => {
-                              playMovie(similarMovie);
-                              window.location.reload(true);
-                            }}
+                              alt=""
+                              className="cursor-pointer"
+                              onClick={() => {
+                                playMovie(similarMovie);
+                                window.location.reload(true);
+                              }}
                             />
                             <div class="p-1">
                               <h5 class="mt-1 mb-2 text-xl sm:text-2xl font-bold tracking-tight text-white dark:text-white">

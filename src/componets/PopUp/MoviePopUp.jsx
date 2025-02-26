@@ -4,9 +4,9 @@ import StarRatings from "react-star-ratings";
 import { PopUpContext } from "../../Context/moviePopUpContext";
 import useUpdateMylist from "../../CustomHooks/useUpdateMylist";
 import usePlayMovie from "../../CustomHooks/usePlayMovie";
-import useGenereConverter from "../../CustomHooks/useGenereConverter";
 import useUpdateLikedMovies from "../../CustomHooks/useUpdateLikedMovies";
 import useUpdateWatchedMovies from "../../CustomHooks/useUpdateWatchedMovies";
+import { premiumUrl } from "@/Constants/Constance";
 
 function MoviePopUp(props) {
   const { showModal, setShowModal } = useContext(PopUpContext);
@@ -15,7 +15,6 @@ function MoviePopUp(props) {
   const { removeFromWatchedMovies, removePopupMessage } =
     useUpdateWatchedMovies();
   const { playMovie } = usePlayMovie();
-  const { convertGenere } = useGenereConverter();
 
   const [PopupInfo, setPopupInfo] = useState({});
 
@@ -131,6 +130,9 @@ function MoviePopUp(props) {
                       <h1 className="text-green-700 font-bold mt-2">
                         {PopupInfo.releaseDate}
                       </h1>
+                      {PopupInfo.premium && <><h1 className="text-white text-xl p-2 rounded mb-4 flex gap-2 items-center">
+                        <img className="w-10 h-10 rounded-md cursor-pointer" src={premiumUrl}></img> Premium Content
+                      </h1></>}
                     </div>
                   </Fade>
                   {/*body*/}

@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 
 import axios from "../../axios";
-import { imageUrl, imageUrl2, API_KEY } from "../../Constants/Constance";
+import { imageUrl, imageUrl2, API_KEY, premiumUrl } from "../../Constants/Constance";
 import useUpdateMylist from "../../CustomHooks/useUpdateMylist";
 import { Fade } from "react-reveal";
 import YouTube from "react-youtube";
@@ -11,7 +11,6 @@ import StarRatings from "react-star-ratings";
 import usePlayMovie from "../../CustomHooks/usePlayMovie";
 import useUpdateWatchedMovies from "../../CustomHooks/useUpdateWatchedMovies";
 import useUpdateLikedMovies from "../../CustomHooks/useUpdateLikedMovies";
-import useGenereConverter from "../../CustomHooks/useGenereConverter";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper";
@@ -28,7 +27,7 @@ function RowPost(props) {
   const { removeFromWatchedMovies, removePopupMessage } =
     useUpdateWatchedMovies();
   const { addToLikedMovies, LikedMoviePopupMessage } = useUpdateLikedMovies();
-  const { convertGenere } = useGenereConverter();
+
 
   const [movies, setMovies] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -45,7 +44,7 @@ function RowPost(props) {
           setMovies(movies);
         });
       }
-      else{
+      else {
         getMoviesByCategory(props.url).then((movies) => {
           setMovies(movies);
         });
@@ -122,7 +121,8 @@ function RowPost(props) {
             className="SwiperStyle"
           >
             {movies.map((obj, index) => {
-              const converted = convertGenere(obj.genre);
+              console.log(obj)
+              const converted = obj.genre;
               return (
                 <SwiperSlide
                   className={props.islarge ? "large" : "bg-cover"}
@@ -132,7 +132,7 @@ function RowPost(props) {
                     <>
                       <img
                         className="rounded-sm"
-                        src={`${ obj.bannerUrl}`}
+                        src={`${obj.bannerUrl}`}
                       />
                     </>
                   ) : (
@@ -278,24 +278,24 @@ function RowPost(props) {
                       </h1>
 
                       <div className="ml-4">
-                        {/* <StarRatings
+                        <StarRatings
                           rating={obj.vote_average / 2}
                           starRatedColor="red"
                           numberOfStars={5}
                           name="rating"
                           starDimension="0.8rem"
                           starSpacing="0.2rem"
-                        /> */}
+                        />
                       </div>
 
-                      {converted &&
-                        converted.map((genre) => {
+                      {/* {
+                        converted?.map((genre) => {
                           return (
                             <span className="hidden text-white ml-4 font-thin text-xs lg:inline">
                               {genre}
                             </span>
                           );
-                        })}
+                        })} */}
                     </Fade>
                   </div>
                 </SwiperSlide>
@@ -349,7 +349,7 @@ function RowPost(props) {
                         className="YouTubeVid"
                       />
                     ) : (
-                      <img src={`${ moviePopupInfo.thumbnailUrl}`} />
+                      <img src={`${moviePopupInfo.thumbnailUrl}`} />
                     )}
 
                     <div className="flex ml-4 items-center -mt-14">
@@ -422,6 +422,9 @@ function RowPost(props) {
                         <h1 className="text-green-700 font-bold mt-2">
                           {moviePopupInfo.releaseDate}
                         </h1>
+                        {moviePopupInfo.premium && <><h1 className="text-white text-xl p-2 rounded mb-4 flex gap-2 items-center">
+                          <img className="w-10 h-10 rounded-md cursor-pointer" src={premiumUrl}></img> Premium Content
+                        </h1></>}
                       </div>
                     </Fade>
                     {/*body*/}
@@ -468,7 +471,7 @@ function RowPost(props) {
 
                           <h1 className="flex text-neutral-400 text-sm leading-relaxed">
                             Genere :
-                            {convertGenere(moviePopupInfo.genre).slice(0, 2).map(
+                            {moviePopupInfo.genre.map(
                               (genere) => {
                                 return (
                                   <span className="text-white ml-2 font-medium">

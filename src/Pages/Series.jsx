@@ -17,27 +17,20 @@ import {
 function Series() {
   return (
     <div>
-      <Banner url={trendingSeries}></Banner>
+       <Banner url={"trending"}></Banner>
       <div className="w-[99%] ml-1">
+        <RowPost first title="Trending" url={"trending"} key={"trending"}></RowPost>
+        <RowPost title="Top Rated" url={"top_rated"} key={"top_rated"}></RowPost>
         <RowPost
-          first
-          title="Trending Series"
-          url={trendingSeries}
-          key={trendingSeries}
+          title="Action"
+          url={"action"}
+          key={"action"}
         ></RowPost>
-        <RowPost title="Animated" url={Animated} key={Animated}></RowPost>
-        <RowPost
-          title="Anime Originals"
-          islarge
-          url={originals}
-          key={originals}
-        ></RowPost>
-        <RowPost title="Science Fiction" url={SciFi}></RowPost>
-        <RowPost title="Upcoming Movies" url={UpcomingMovies}></RowPost>
-        <RowPost title="Comedy" url={comedy}></RowPost>
-        <RowPost title="Adventure" url={Adventure}></RowPost>
-        <RowPost title="Horror" url={horror}></RowPost>
-        <RowPost title="War" url={War}></RowPost>
+        <RowPost title="Animation" url={"animation"}></RowPost>
+        <RowPost title="Drama" url={"drama"}></RowPost>
+        <RowPost title="Comedy" url={"comedy"}></RowPost>
+        <RowPost title="Adventure" url={"Adventure"}></RowPost>
+        <RowPost title="Horror" url={"horror"}></RowPost>
       </div>
       <Footer></Footer>
     </div>

@@ -5,7 +5,6 @@ import useUpdateMylist from "../CustomHooks/useUpdateMylist";
 import MoviePopUp from "../componets/PopUp/MoviePopUp";
 import usePlayMovie from "../CustomHooks/usePlayMovie";
 import useUpdateLikedMovies from "../CustomHooks/useUpdateLikedMovies";
-import useGenereConverter from "../CustomHooks/useGenereConverter";
 import StarRatings from "react-star-ratings";
 import { collection, query, where, getDocs, orderBy, startAt, endAt } from "firebase/firestore";
 import { db } from "@/Firebase/FirebaseConfig";
@@ -14,7 +13,6 @@ function Search() {
   const { addToMyList, PopupMessage } = useUpdateMylist();
   const { playMovie } = usePlayMovie();
   const { addToLikedMovies } = useUpdateLikedMovies();
-  const { convertGenere } = useGenereConverter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState([]);

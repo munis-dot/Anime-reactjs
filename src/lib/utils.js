@@ -18,6 +18,20 @@ export const fetchAnimeDetails = async (animeTitle) => {
   }
 };
 
+export const getDocumentByCustomId = async (collectionName = 'movies', customId) => {
+  const moviesCollection = collection(db, collectionName);
+  const q = query(moviesCollection, where("id", "==", customId));
+
+  const querySnapshot = await getDocs(q);
+  
+  if (!querySnapshot.empty) {
+    const doc = querySnapshot.docs[0]; // Get the first document
+    return { id: doc.id, ...doc.data() };
+  } 
+  
+  return null; // Return null if no document found
+};
+
 export const fetchDocumentById = async (collectionName = 'movies', docId) => {
   try {
     const docRef = doc(db, collectionName, docId);
@@ -55,7 +69,7 @@ export const getMoviesByGenre = async (genre) => {
   const q = query(moviesRef, where("genre", "array-contains", genre));
   const querySnapshot = await getDocs(q);
 
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return querySnapshot.docs.map((doc) => {console.log(doc); return({ id: doc.id, ...doc.data() })});
 };
 
 // Fetch Trending Movies (Sort by Popularity)
@@ -64,7 +78,7 @@ export const getTrendingMovies = async () => {
   const q = query(moviesRef, where("category", "==", "trending"));
   const querySnapshot = await getDocs(q);
 
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return querySnapshot.docs.map((doc) => {console.log(doc); return({ id: doc.id, ...doc.data() })});
 };
 
 export function cn(...inputs) {

@@ -7,7 +7,6 @@ import useUpdateMylist from "../../CustomHooks/useUpdateMylist";
 import usePlayMovie from "../../CustomHooks/usePlayMovie";
 import useUpdateWatchedMovies from "../../CustomHooks/useUpdateWatchedMovies";
 import useUpdateLikedMovies from "../../CustomHooks/useUpdateLikedMovies";
-import useGenereConverter from "../../CustomHooks/useGenereConverter";
 import { db } from "../../Firebase/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { AuthContext } from "../../Context/UserContext";
@@ -26,7 +25,6 @@ function UserMovieSection(props) {
   const { addToLikedMovies, removeFromLikedMovies, LikedMoviePopupMessage } =
     useUpdateLikedMovies();
   const { playMovie } = usePlayMovie();
-  const { convertGenere } = useGenereConverter();
 
   const [myMovies, setMyMovies] = useState([]);
   const [moviePopupInfo, setMoviePopupInfo] = useState({});
@@ -90,7 +88,7 @@ function UserMovieSection(props) {
             .map((movie) => {
               let converted
               if (movie.genre) {
-                converted = convertGenere(movie.genre);
+                converted = movie.genre;
               }
               return (
                 <div className="p-1 mt-2 mb-5">
