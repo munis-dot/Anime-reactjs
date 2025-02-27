@@ -36,7 +36,7 @@ function App() {
   const path = window.location.pathname
 
   return (
-    <div>
+    <div className="body">
       {(User && path !== '/admin') ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
       <Suspense replace fallback={<Loading />}>
         <Routes>

@@ -39,7 +39,6 @@ function Play() {
 
   const getMovieData = async () => {
     const data = await getDocumentByCustomId('movies',Number(id));
-    console.log(data)
     setMovieDetails(data)
   }
 
