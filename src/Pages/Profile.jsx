@@ -19,6 +19,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { fetchDocumentById } from "@/lib/utils";
 import { premiumUrl } from "@/Constants/Constance";
+import { doc, updateDoc } from "firebase/firestore";
 
 function Profile() {
   const { User } = useContext(AuthContext);
@@ -29,13 +30,13 @@ function Profile() {
   const [isMyListUpdated, setisMyListUpdated] = useState(false);
   const [premium, setPremium] = useState(false);
   const navigate = useNavigate();
-
+  const [formData, setFormData] = useState({});
   useEffect(() => {
     if (User != null) {
       setProfilePic(User.photoURL);
       fetchDocumentById('Users', User.uid).then((res) => {
         console.log(res)
-        setPremium(res.premium)
+        setFormData(res)
       })
     }
   }, []);
@@ -47,18 +48,21 @@ function Profile() {
   const changeUserName = (e) => {
     e.preventDefault();
     if (isUserNameChanged) {
-      if (userName !== "") {
-        const auth = getAuth();
-        updateProfile(auth.currentUser, { displayName: userName })
-          .then(() => {
-            notify();
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      } else {
-        setIsUserNameChanged(false);
-      }
+      const auth = getAuth();
+      updateDoc(
+        doc(db, "Users", User.uid),
+        formData,
+        { merge: true }
+      )
+        .catch(err => toast.error('payment failure'))
+      updateProfile(auth.currentUser, { displayName: userName })
+        .then(() => {
+          notify();
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+      setIsUserNameChanged(false);
     }
   };
 
@@ -84,11 +88,15 @@ function Profile() {
         alert(error.message);
       });
   };
+
+  const handleChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
   console.log(User);
   return (
     <div>
       <div
-        className="flex h-screen justify-center items-center"
+        className="flex justify-center items-center"
         style={{
           backgroundImage: `linear-gradient(0deg, hsl(0deg 0% 0% / 73%) 0%, hsl(0deg 0% 0% / 73%) 35%), url(${WelcomePageBanner})`,
         }}
@@ -140,12 +148,45 @@ function Profile() {
                 <h1 className="text-white text-xl bg-stone-900 p-2 rounded mb-4 md:pr-52">
                   {User ? User.email : null}
                 </h1>
+                <h1 className="text-white text-lg font-medium mb-2">Age</h1>
+                <input
+                  type="number"
+                  name="age"
+                  value={formData.age}
+                  onChange={(e) =>
+                    handleChange(e) || setIsUserNameChanged(true)
+                  }
+                  className="block w-full rounded-md bg-stone-900 text-white border-gray-300 p-2 mb-6 focus:border-indigo-500 focus:ring-indigo-500 sm:text-base"
+                  placeholder='age'
+                />
+                <h1 className="text-white text-lg font-medium mb-2">Gender</h1>
+                <input
+                  type="text"
+                  name="gender"
+                  value={formData.gender}
+                  onChange={(e) =>
+                    handleChange(e) || setIsUserNameChanged(true)
+                  }
+                  className="block w-full rounded-md bg-stone-900 text-white border-gray-300 p-2 mb-6 focus:border-indigo-500 focus:ring-indigo-500 sm:text-base"
+                  placeholder='gender'
+                />
+                <h1 className="text-white text-lg font-medium mb-2">Phone</h1>
+                <input
+                  type="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    handleChange(e) || setIsUserNameChanged(true)
+                  }
+                  className="block w-full rounded-md bg-stone-900 text-white border-gray-300 p-2 mb-6 focus:border-indigo-500 focus:ring-indigo-500 sm:text-base"
+                  placeholder='phone'
+                />
                 <h1 className="text-white text-xl p-2 rounded mb-4">
                   Unique ID : {User ? User.uid : null}
                 </h1>
                 <h1 className="text-white text-xl p-2 rounded mb-4 flex gap-2 items-center">
                   <img className="w-10 h-10 rounded-md cursor-pointer" src={premiumUrl}></img>
-                  <div>{premium ? 'You\'re the Premium Member' : <button
+                  <div>{formData.premium ? 'You\'re the Premium Member' : <button
                     onClick={() => navigate("/payment")}
                     className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
                   >Subscribe life time access</button>}</div>
@@ -216,7 +257,7 @@ function Profile() {
                 </svg>
                 SignOut
               </button>
-              {userName != "" ? (
+              {(userName != "" || isUserNameChanged) ? (
                 <button
                   onClick={changeUserName}
                   className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"

@@ -65,7 +65,7 @@ function SignUp() {
 
         const user = userCredential.user;
         if (user != null) {
-          navigate("/");
+          navigate("/profile");
         }
       })
       .catch((error) => {

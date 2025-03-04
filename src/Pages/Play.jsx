@@ -38,18 +38,18 @@ function Play() {
   const location = useLocation();
 
   const getMovieData = async () => {
-    const data = await getDocumentByCustomId('movies',Number(id));
+    const data = await getDocumentByCustomId('movies',id);
     setMovieDetails(data)
   }
 
   useEffect(() => {
-    if (location.state.From === "MyList") {
+    if (location.state?.From === "MyList") {
       setIsFromMyList(true);
     }
-    if (location.state.From === "LikedMovies") {
+    if (location.state?.From === "LikedMovies") {
       setIsFromLikedMovies(true);
     }
-    if (location.state.From === "WatchedMovies") {
+    if (location.state?.From === "WatchedMovies") {
       setIsFromWatchedMovies(true);
     }
     getMovieData();

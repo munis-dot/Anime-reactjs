@@ -22,6 +22,8 @@ import Navbar from "./componets/Header/Navbar";
 import NavbarWithoutUser from "./componets/Header/NavbarWithoutUser";
 import VideoUploadForm from "./Pages/VideoUpload";
 import PaymentScreen from "./componets/payment/PaymentScreen";
+import Dashboard from "./Pages/Dashboard";
+import Table from "./Pages/Table";
 
 function App() {
   const { User, setUser } = useContext(AuthContext);
@@ -37,7 +39,7 @@ function App() {
 
   return (
     <div className="body">
-      {(User && path !== '/admin') ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
+      { User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
       <Suspense replace fallback={<Loading />}>
         <Routes>
           <Route index path="/" element={User ? <Home /> : <Welcome />} />
@@ -55,7 +57,10 @@ function App() {
             </>
           ) : null}
           <Route path="/play/:id" element={<Play />} />
-          <Route path="/admin" element={<VideoUploadForm />} />
+          <Route path="/admin/upload" element={<VideoUploadForm />} />
+          <Route path="/admin/upload/:videoId" element={<VideoUploadForm />} />
+          <Route path="/admin/videos" element={<Table />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="*" element={<ErrorPage />} />

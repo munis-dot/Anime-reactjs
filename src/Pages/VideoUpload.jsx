@@ -210,7 +210,7 @@
 //     </div>
 //   );
 // };
-
+//////////////////////////////////////////////////////////////////////////////////////////////
 // export default VideoUploadForm;
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
@@ -224,8 +224,10 @@ import { UploadCloud, Image as ImageIcon } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import Select from "react-select";
 import { db } from "@/Firebase/FirebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, getDocs, query, where, updateDoc } from "firebase/firestore";
 import toast, { Toaster } from "react-hot-toast";
+import { useParams } from "react-router-dom";
+import { getDocumentByCustomId } from "@/lib/utils";
 
 const VideoUploadForm = () => {
   const [video, setVideo] = useState(null);
@@ -235,7 +237,7 @@ const VideoUploadForm = () => {
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [bannerUrl, setBannerUrl] = useState("");
   const [banner, setBanner] = useState("");
-  const [bannerPreview, setBannerPreview] = useState("");
+  const [bannerPreview, setBannerPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [genres, setGenres] = useState([]);
 
@@ -264,6 +266,25 @@ const VideoUploadForm = () => {
     vote_average: 0,
     premium: false,
   });
+
+  const { videoId } = useParams()
+  useEffect(() => {
+    if (videoId) {
+      const fetchVideoDetails = async () => {
+        try {
+          const data = await getDocumentByCustomId('movies', videoId);
+          if (data) {
+            setFormData(data);
+          } else {
+            console.log("No video found with this ID.");
+          }
+        } catch (error) {
+          console.error("Error fetching video details:", error);
+        }
+      };
+      fetchVideoDetails();
+    }
+  }, [videoId]);
 
   useEffect(() => {
     fetch("https://api.jikan.moe/v4/genres/anime")
@@ -301,34 +322,45 @@ const VideoUploadForm = () => {
   });
 
   const uploadVideo = async () => {
-    if (!video) return alert("Please select a video!");
-
     setLoading(true);
-    const formData = new FormData();
-    formData.append("file", video);
-    formData.append("upload_preset", "demo12");
+    let data;
+    if (!videoId) {
+      if (!video) return alert("Please select a video!");
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/dlliku5ku/video/upload", {
-      method: "POST",
-      body: formData,
-    });
+      const formData = new FormData();
+      formData.append("file", video);
+      formData.append("upload_preset", "demo12");
 
-    const data = await res.json();
-    setVideoUrl(data.secure_url);
+      const res = await fetch("https://api.cloudinary.com/v1_1/dlliku5ku/video/upload", {
+        method: "POST",
+        body: formData,
+      });
 
+      data = await res.json();
+      setVideoUrl(data.secure_url);
+    }
     let thumbnailUrls = '';
     let bannerUrls = '';
     if (thumbnail) {
       thumbnailUrls = await uploadThumbnail();
-    } else {
+    }
+    else if (videoId) {
+      thumbnailUrls = formData.thumbnailUrl;
+    }
+    else {
       setThumbnailUrl(`${data.secure_url.split(".mp4")[0]}.jpg`); // Generate thumbnail from video
     }
 
     if (banner) {
       bannerUrls = await uploadBanner();
     }
-
-    await saveToFirestore(data.secure_url, thumbnailUrls ?? `${data.secure_url.split(".mp4")[0]}.jpg`, bannerUrls);
+    else if (videoId) {
+      bannerUrls = formData.bannerUrl;
+    }
+    if (videoId) {
+      await saveToFirestore(formData.videoUrl, thumbnailUrls, bannerUrls);
+    }
+    else await saveToFirestore(data.secure_url, thumbnailUrls ?? `${data.secure_url.split(".mp4")[0]}.jpg`, bannerUrls);
     setLoading(false);
   };
 
@@ -364,14 +396,46 @@ const VideoUploadForm = () => {
 
   const saveToFirestore = async (videoUrl, thumbnailUrl, bannerUrl) => {
     try {
-      await addDoc(collection(db, "movies"), {
+      const videoData = {
         ...formData,
         videoUrl,
         thumbnailUrl,
         bannerUrl,
-        createdAt: new Date(),
-      });
-      toast.success("Video uploaded successfully!");
+        updatedAt: new Date(),
+      };
+
+      if (videoId) {
+        // Update existing video
+        const moviesRef = collection(db, "movies");
+        const isNumeric = typeof videoId === "number" || /^\d+$/.test(videoId);
+        const formattedId = isNumeric ? Number(videoId) : videoId;
+        if(isNumeric) {
+          const q = query(moviesRef, where("id", "==", formattedId)); // Query based on `videoId`
+
+          const querySnapshot = await getDocs(q);
+  
+          if (querySnapshot.empty) {
+            throw new Error("Video not found");
+          }
+          // Assuming `videoId` is unique, update the first matched document
+          const docRef = querySnapshot.docs[0].ref;
+          await updateDoc(docRef, videoData);
+        }
+        else{
+          // Update existing document with unique `videoId`
+          const docRef = doc(collection(db, "movies"), videoId);
+          await updateDoc(docRef, videoData);
+        }
+       
+        toast.success("Video updated successfully!");
+      } else {
+        // Create new video
+        await addDoc(collection(db, "movies"), {
+          ...videoData,
+          createdAt: new Date(),
+        });
+        toast.success("Video uploaded successfully!");
+      }
     } catch (error) {
       console.error("Error saving to Firestore:", error);
     }
@@ -379,6 +443,37 @@ const VideoUploadForm = () => {
 
   const handleChange = (value, name) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const selectStyles = {
+    control: (base) => ({
+      ...base,
+      backgroundColor: "#1f2937",
+      color: "white",
+      borderColor: "#333",
+    }),
+    menu: (base) => ({
+      ...base,
+      backgroundColor: "#1a1a1a",
+      color: "white",
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isSelected ? "#333" : "#1a1a1a",
+      color: state.isSelected ? "white" : "#ccc",
+    }),
+    singleValue: (base) => ({
+      ...base,
+      color: "white",
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: "#bbb",
+    }),
+    input: (base) => ({
+      ...base,
+      color: "white",
+    }),
   };
 
   return (
@@ -395,79 +490,139 @@ const VideoUploadForm = () => {
       <Card className="w-full max-w-2xl p-6 bg-gray-900 shadow-lg rounded-2xl">
         <h2 className="text-2xl font-bold mb-4 text-red-600">Upload Video</h2>
         <CardContent>
-          <motion.div {...getRootProps()} className="border-2 border-dashed border-gray-600 p-6 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-800">
+          {!videoId && <motion.div {...getRootProps()} className="border-2 border-dashed border-gray-600 p-6 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-800">
             <input {...getInputProps()} />
             <UploadCloud size={48} className="text-gray-400 mb-2" />
             {video ? <p className="text-green-500">{video.name}</p> : <p className="text-gray-400">Drag & drop a video file here, or click to select</p>}
-          </motion.div>
+          </motion.div>}
 
           <motion.div {...getThumbProps()} className="border-2 border-dashed border-gray-600 p-4 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-800 mt-4">
             <input {...getThumbInputProps()} />
             <ImageIcon size={40} className="text-gray-400 mb-2" />
-            {thumbnailPreview ? <img src={thumbnailPreview} alt="Thumbnail Preview" className="mt-2 w-32 h-32 rounded-lg object-cover" /> : <p className="text-gray-400">Upload Thumbnail</p>}
+            {thumbnailPreview || formData.thumbnailUrl ? <img src={thumbnailPreview ?? formData.thumbnailUrl} alt="Thumbnail Preview" className="mt-2 w-32 h-32 rounded-lg object-cover" /> : <p className="text-gray-400">Upload Thumbnail</p>}
           </motion.div>
 
           <motion.div {...getThumbProps2()} className="border-2 border-dashed border-gray-600 p-4 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-gray-800 mt-4">
             <input {...getThumbInputProps2()} />
             <ImageIcon size={40} className="text-gray-400 mb-2" />
-            {bannerPreview ? <img src={bannerPreview} alt="Thumbnail Preview" className="mt-2 w-32 h-32 rounded-lg object-cover" /> : <p className="text-gray-400">Upload Banner (big)</p>}
+            {bannerPreview || formData.bannerUrl ? <img src={bannerPreview ?? formData.bannerUrl} alt="Thumbnail Preview" className="mt-2 w-32 h-32 rounded-lg object-cover" /> : <p className="text-gray-400">Upload Banner (big)</p>}
           </motion.div>
 
-          <div className="mt-4 space-y-3">
-            <Input placeholder="Title" name="title" onChange={(e) => handleChange(e.target.value, "title")} />
-            <Textarea placeholder="overview" name="overview" onChange={(e) => handleChange(e.target.value, "overview")} />
-            <Select styles={{
-              control: (base) => ({ ...base, backgroundColor: "#111827", color: "white", borderColor: "white" }),
-              menu: (base) => ({ ...base, backgroundColor: "#111827" }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isSelected ? "#374151" : "#111827",
-                color: "white",
-              }),
-              placeholder: (base) => ({ ...base, color: "#9ca3af" }),
-            }} isMulti options={genres} placeholder="Select Genre" onChange={(selected) => handleChange(selected.map((opt) => opt.value), "genre")} />
-            <CreatableSelect options={genres} styles={{
-              control: (base) => ({ ...base, backgroundColor: "#111827", color: "white", borderColor: "white" }),
-              menu: (base) => ({ ...base, backgroundColor: "#111827" }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isSelected ? "#374151" : "#111827",
-                color: "white",
-              }),
-              placeholder: (base) => ({ ...base, color: "#9ca3af" }),
-            }} isMulti placeholder="Select or create tags" onChange={(selected) => handleChange(selected.map((opt) => opt.value), "tags")} />
-            <Select styles={{
-              control: (base) => ({ ...base, backgroundColor: "#111827", color: "white", borderColor: "white" }),
-              menu: (base) => ({ ...base, backgroundColor: "#111827", color: "white" }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isSelected ? "#374151" : "#111827",
-                color: "white",
-              }),
-              placeholder: (base) => ({ ...base, color: "white" }),
-            }} options={categories} placeholder="Select Category" onChange={(selected) => handleChange(selected.value, "category")} />
-            <Input placeholder="Language" name="language" onChange={(e) => handleChange(e.target.value, "language")} />
-            <Input type="date" placeholder="Release Date" name="releaseDate" onChange={(e) => handleChange(e.target.value, "releaseDate")} />
-            <Input placeholder="Duration" name="duration" onChange={(e) => handleChange(e.target.value, "duration")} />
-            <Input placeholder="Vote" name="vote_average" type='number' onChange={(e) => handleChange(e.target.value, "vote_average")} />
+          <div className="mt-4 space-y-4">
+            {/* Title Input */}
+            <Input
+              className="bg-gray-800 text-white border border-gray-600 p-2 rounded-lg w-full placeholder-gray-400"
+              placeholder="Title"
+              name="title"
+              value={formData.title}
+              onChange={(e) => handleChange(e.target.value, "title")}
+            />
+
+            {/* Overview Textarea */}
+            <Textarea
+              className="bg-gray-800 text-white border border-gray-600 p-2 rounded-lg w-full placeholder-gray-400"
+              placeholder="Overview"
+              name="overview"
+              value={formData.overview}
+              onChange={(e) => handleChange(e.target.value, "overview")}
+            />
+
+            {/* Genre Select */}
+            <Select
+              styles={selectStyles}
+              isMulti
+              options={genres}
+              value={genres.filter(g => formData.genre.includes(g.value))}
+              onChange={(selected) => handleChange(selected.map(opt => opt.value), "genre")}
+              placeholder="Select Genre"
+            />
+
+            {/* Tags Select (Creatable) */}
+            <CreatableSelect
+              styles={selectStyles}
+              isMulti
+              options={genres}
+              value={genres.filter(g => formData.tags.includes(g.value))}
+              onChange={(selected) => handleChange(selected.map(opt => opt.value), "tags")}
+              placeholder="Select or create tags"
+            />
+
+            {/* Category Select */}
+            <Select
+              styles={selectStyles}
+              options={categories}
+              value={categories.find(c => c.value === formData.category)}
+              onChange={(selected) => handleChange(selected.value, "category")}
+              placeholder="Select Category"
+            />
+
+            {/* Other Inputs */}
+            <Input
+              className="bg-gray-800 text-white border border-gray-600 p-2 rounded-lg w-full placeholder-gray-400"
+              placeholder="Language"
+              name="language"
+              value={formData.language}
+              onChange={(e) => handleChange(e.target.value, "language")}
+            />
+
+            <Input
+              className="bg-gray-800 text-white border border-gray-600 p-2 rounded-lg w-full placeholder-gray-400"
+              type="date"
+              placeholder="Release Date"
+              name="releaseDate"
+              value={formData.releaseDate?.includes('T') ? formData.releaseDate.split("T")[0] : formData.releaseDate}
+              onChange={(e) => handleChange(e.target.value, "releaseDate")}
+            />
+
+            <Input
+              className="bg-gray-800 text-white border border-gray-600 p-2 rounded-lg w-full placeholder-gray-400"
+              placeholder="Duration"
+              name="duration"
+              value={formData.duration}
+              onChange={(e) => handleChange(e.target.value, "duration")}
+            />
+
+            <Input
+              className="bg-gray-800 text-white border border-gray-600 p-2 rounded-lg w-full placeholder-gray-400"
+              placeholder="Vote"
+              name="vote_average"
+              type="number"
+              value={formData.vote_average}
+              onChange={(e) => handleChange(e.target.value, "vote_average")}
+            />
+
+            {/* Premium Switch */}
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.premium}
                 onCheckedChange={(checked) => handleChange(checked, "premium")}
-                style={{
-                  backgroundColor: formData.premium ? '#fff' : '#000', // Green when checked, gray when unchecked
-                }}
               />
-              <span>Premium Content</span>
+              <span className="text-white">Premium Content</span>
             </div>
-            <Button onClick={uploadVideo} disabled={loading} className="bg-red-600 hover:bg-red-700 w-full">
+
+            {/* Upload Button */}
+            <Button
+              onClick={uploadVideo}
+              disabled={loading}
+              className="bg-red-600 hover:bg-red-700 text-white w-full p-2 rounded-lg disabled:opacity-50"
+            >
               {loading ? "Uploading..." : "Upload"}
             </Button>
           </div>
+
         </CardContent>
       </Card>
     </div>
   );
 };
-
+const customSelectStyles = {
+  control: (base) => ({ ...base, backgroundColor: "#1f2937", color: "white", borderColor: "white" }),
+  menu: (base) => ({ ...base, backgroundColor: "#1f2937", color: "white" }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isSelected ? "#374151" : "#1f2937",
+    color: "white",
+  }),
+  placeholder: (base) => ({ ...base, color: "#9ca3af" }),
+};
 export default VideoUploadForm;
