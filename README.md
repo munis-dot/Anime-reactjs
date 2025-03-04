@@ -39,4 +39,4 @@ This Anime clone project was developed to deepen understanding and proficiency i
 
 ## Link to the Site
 
-[Anime Clone](https://netflicz-reactjs-rho.vercel.app/)
+[Anime Clone](https://localhost:5173/)

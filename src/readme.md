@@ -1,4 +1,6 @@
-# Netflix UI clone with React.js
+# Anime UI clone with React.js
+
 ## _This is the directory_
+
 ---
 
