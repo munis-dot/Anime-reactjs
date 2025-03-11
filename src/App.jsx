@@ -40,7 +40,7 @@ function App() {
 
   return (
     <div className="body">
-      {User.email === "admin@gmail.com" ? <></> : User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
+      {User?.email === "admin@gmail.com" ? <></> : User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
       <Suspense replace fallback={<Loading />}>
         <Routes>
           <Route index path="/" element={User ? <Home /> : <Welcome />} />
