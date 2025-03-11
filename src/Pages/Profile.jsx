@@ -280,7 +280,13 @@ function Profile() {
                 </button>
               ) : (
                 <button
-                  onClick={() => navigate("/")}
+                  onClick={() => {
+                    if(User.email === "admin@gmail.com"){
+                      navigate("/admin/dashboard")
+                    }else{
+                      navigate("/")
+                    }
+                  }}
                   className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
                 >
                   <svg

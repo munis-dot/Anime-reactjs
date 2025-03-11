@@ -36,7 +36,11 @@ function SignIn() {
         const user = userCredential.user;
         console.log(user);
         if (user != null) {
-          navigate("/");
+          if(user.email === "admin@gmail.com"){
+            navigate("/admin/dashboard");
+          }else{
+            navigate("/");
+          }
         }
       })
       .catch((error) => {
