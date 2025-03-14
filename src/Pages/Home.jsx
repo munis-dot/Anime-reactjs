@@ -18,10 +18,16 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../Firebase/FirebaseConfig";
 import { AuthContext } from "../Context/UserContext";
-
+import { useNavigate } from "react-router-dom";
 function Home() {
   const { User } = useContext(AuthContext);
   const [watchedMovies, setWatchedMovies] = useState([]);
+  const navigate = useNavigate();
+  useEffect(()=>{
+    if(User?.email === "admin@gmail.com"){
+      navigate("/admin/dashboard")
+    }
+  },[User])
 
   useEffect(() => {
     getDoc(doc(db, "WatchedMovies", User.uid)).then((result) => {

@@ -42,7 +42,7 @@ function Profile() {
   }, []);
 
   function notify() {
-    toast.success("  Data Updated Sucessfuly  ");
+    toast.success("Data Updated Sucessfuly  ");
   }
 
   const changeUserName = (e) => {
@@ -54,7 +54,7 @@ function Profile() {
         formData,
         { merge: true }
       )
-        .catch(err => toast.error('payment failure'))
+        .catch(err => toast.error('failure'))
       updateProfile(auth.currentUser, { displayName: userName })
         .then(() => {
           notify();
@@ -101,17 +101,17 @@ function Profile() {
           backgroundImage: `linear-gradient(0deg, hsl(0deg 0% 0% / 73%) 0%, hsl(0deg 0% 0% / 73%) 35%), url(${WelcomePageBanner})`,
         }}
       >
-        {isMyListUpdated ? (
-          <Toaster
-            toastOptions={{
-              style: {
-                padding: "1.5rem",
-                backgroundColor: "##f4fff4",
-                borderLeft: "6px solid green",
-              },
-            }}
-          />
-        ) : null}
+
+        <Toaster
+          toastOptions={{
+            style: {
+              padding: "1.5rem",
+              backgroundColor: "##f4fff4",
+              borderLeft: "6px solid green",
+            },
+          }}
+        />
+
         <Fade>
           <div className="bg-[#000000bf] p-5 md:p-12 rounded-md">
             <h1 className="text-4xl text-white font-bold mb-4 md:mb-8">
@@ -138,8 +138,9 @@ function Profile() {
                 </h1>
                 <input
                   type="text"
+                  name="displayName"
                   onChange={(e) =>
-                    setUserName(e.target.value) || setIsUserNameChanged(true)
+                    handleChange(e) || setUserName(e.target.value) || setIsUserNameChanged(true)
                   }
                   className="block w-full rounded-md bg-stone-900 text-white border-gray-300 p-2 mb-6 focus:border-indigo-500 focus:ring-indigo-500 sm:text-base"
                   placeholder={User ? User.displayName : null}
@@ -281,9 +282,9 @@ function Profile() {
               ) : (
                 <button
                   onClick={() => {
-                    if(User.email === "admin@gmail.com"){
+                    if (User.email === "admin@gmail.com") {
                       navigate("/admin/dashboard")
-                    }else{
+                    } else {
                       navigate("/")
                     }
                   }}

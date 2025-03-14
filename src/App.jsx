@@ -25,6 +25,8 @@ import PaymentScreen from "./componets/payment/PaymentScreen";
 import Dashboard from "./Pages/Dashboard";
 import Table from "./Pages/Table";
 import AdminNav from './components/AdminNav';
+import UserList from './components/UserList';
+import BannedAccount from "./components/BannedAccount";
 
 function App() {
   const { User, setUser } = useContext(AuthContext);
@@ -40,7 +42,7 @@ function App() {
 
   return (
     <div className="body">
-      {User?.email === "admin@gmail.com" ? <></> : User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
+      {User?.email === "admin@gmail.com" ? <AdminNav /> : User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
       <Suspense replace fallback={<Loading />}>
         <Routes>
           <Route index path="/" element={User ? <Home /> : <Welcome />} />
@@ -57,22 +59,22 @@ function App() {
               <Route path="/play/:id" element={<Play />} />
             </>
           ) : null}
-          <Route path="/play/:id" element={<Play />} />
           <Route
             path="/admin/*"
             element={
-              <>
-                <AdminNav />
-                <Routes>
-                  <Route path="/upload" element={<VideoUploadForm />} />
-                  <Route path="/upload/:videoId" element={<VideoUploadForm />} />
-                  <Route path="/videos" element={<Table />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                </Routes>
-              </>
+                <>
+                  <Routes>
+                    <Route path="/upload" element={<VideoUploadForm />} />
+                    <Route path="/upload/:videoId" element={<VideoUploadForm />} />
+                    <Route path="/videos" element={<Table />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/users" element={<UserList />} />
+                  </Routes>
+                </>
             }
           />
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/bannedAccount" element={<BannedAccount />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>

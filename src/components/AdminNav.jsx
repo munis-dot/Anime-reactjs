@@ -5,7 +5,7 @@ import { Fade } from "react-reveal";
 import { Link, useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 import { AuthContext } from "@/Context/UserContext";
-
+import img from '../../public/anime.png';
 function Navbar(props) {
   const { User } = useContext(AuthContext);
   const [profilePic, setProfilePic] = useState("");
@@ -65,7 +65,7 @@ function Navbar(props) {
                 <div className="flex-shrink-0">
                   <img
                     className="h-6 cursor-pointer w-18"
-                    src="anime.png"
+                    src={img}
                     alt="ANIME"
                   />
                 </div>
@@ -90,6 +90,13 @@ function Navbar(props) {
                       className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m"
                     >
                       Video Upload
+                    </Link>
+
+                    <Link
+                      to={"/admin/users"}
+                      className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m"
+                    >
+                      Users
                     </Link>
                   </div>
                 </div>
@@ -122,15 +129,31 @@ function Navbar(props) {
                       />
                     </Link>
                     <ul class="absolute hidden text-white pt-1 -ml-32 group-hover:block transition ease-in-out delay-150">
-                      <li>
-                        <a
-                          onClick={SignOut}
-                          className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
-                        >
-                          Sign Out
-                        </a>
-                      </li>
-                    </ul>
+                                         <li>
+                                           <Link
+                                             to={"/profile"}
+                                             className="cursor-pointer rounded-t bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                                           >
+                                             Profile
+                                           </Link>
+                                         </li>
+                                         <li>
+                                           <Link
+                                             to={"/signin"}
+                                             className="cursor-pointer bg-stone-900 font-semibold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                                           >
+                                             Add another User
+                                           </Link>
+                                         </li>
+                                         <li>
+                                           <a
+                                             onClick={SignOut}
+                                             className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                                           >
+                                             Sign Out
+                                           </a>
+                                         </li>
+                                       </ul>
                   </div>
                 </div>
               </div>
@@ -211,6 +234,12 @@ function Navbar(props) {
                   <Link to={"/admin/upload"}>
                     <a className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white">
                       Video Upload
+                    </a>
+                  </Link>
+
+                  <Link to={"/admin/users"}>
+                    <a className="block px-3 py-2 text-base font-medium text-gray-300 rounded-md hover:bg-red-800 hover:text-white">
+                      Users
                     </a>
                   </Link>
 

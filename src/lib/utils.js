@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "@/Firebase/FirebaseConfig";
 import axios from 'axios';
 
@@ -10,7 +10,7 @@ export const deleteVideo = async (videoId) => {
     const isNumeric = typeof videoId === "number" || /^\d+$/.test(videoId);
     if (isNumeric) {
       const formattedId = isNumeric ? Number(videoId) : videoId;
-      const q = query(moviesRef, where("videoId", "==", formattedId)); // Query document by `videoId`
+      const q = query(moviesRef, where("id", "==", formattedId)); // Query document by `videoId`
 
       const querySnapshot = await getDocs(q);
 
@@ -28,8 +28,8 @@ export const deleteVideo = async (videoId) => {
       const docRef = doc(db, "movies", videoId);
       await deleteDoc(docRef); // Delete document
     }
-
     console.log("Video deleted successfully!");
+    return true;
   } catch (error) {
     console.error("Error deleting video:", error);
   }

@@ -119,10 +119,12 @@
 // };
 
 // export default Table;
-import { fetchAllMovies } from "@/lib/utils";
+import { deleteVideo, fetchAllMovies } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { Eye, Edit, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
+
 const Table = () => {
   const [movies, setMovies] = useState([]);
   const navigate = useNavigate();
@@ -135,11 +137,35 @@ const Table = () => {
 
     getMovies();
   }, []);
-  console.log(movies)
+
+
+  const handleDelete = async (movieId) => {
+    try {
+      console.log(movieId)
+      await deleteVideo(movieId);
+      setMovies((prevMovies) => prevMovies.filter(movie => {
+        return movie.id != movieId
+      }));
+      toast.success("Movie deleted successfully");
+    } catch (error) {
+      toast.error("Error deleting movie: " + error.message);
+      console.error("Error deleting movie:", error);
+    }
+  }
+
   return (
     <div className="bg-black min-h-screen p-6">
+      <Toaster
+        toastOptions={{
+          style: {
+            padding: "1.5rem",
+            backgroundColor: "#f4fff4",
+            borderLeft: "6px solid lightgreen",
+          },
+        }}
+      />
       <h2 className="text-red-600 text-3xl font-bold mb-4 text-center">
-        🎬 Netflix Movie List
+        🎬 Anime Movie List
       </h2>
 
       <div className="overflow-x-auto">
