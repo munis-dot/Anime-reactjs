@@ -43,7 +43,7 @@ const UserList = () => {
       const userList = userSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })).filter(user => user.email !== "admin@gmail.com");
       setUsers(userList);
       setLoading(false);
     } catch (error) {
