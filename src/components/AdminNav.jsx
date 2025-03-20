@@ -98,6 +98,12 @@ function Navbar(props) {
                     >
                       Users
                     </Link>
+                    <Link
+                      to={"/admin/premiumUsers"}
+                      className="py-2 font-medium text-white transition ease-in-out delay-150 rounded-md cursor-pointer hover:text-red-800 lg:px-3 text-m"
+                    >
+                      Premium Users
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -105,7 +111,7 @@ function Navbar(props) {
               <div className="ml-auto">
                 <div className="flex">
                   {/* Search Icon */}
-                  
+
 
                   {User ? (
                     <a className="items-center hidden pr-4 mt-auto mb-auto text-base font-medium text-white transition ease-in-out delay-150 cursor-pointer hover:text-red-800 md:flex">
@@ -114,7 +120,7 @@ function Navbar(props) {
                   ) : null}
 
                   {/* Notification icon */}
-                 
+
 
                   <div className="group inline-block relative transition ease-in-out delay-300">
                     <Link to={"/profile"}>
@@ -129,31 +135,31 @@ function Navbar(props) {
                       />
                     </Link>
                     <ul class="absolute hidden text-white pt-1 -ml-32 group-hover:block transition ease-in-out delay-150">
-                                         <li>
-                                           <Link
-                                             to={"/profile"}
-                                             className="cursor-pointer rounded-t bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
-                                           >
-                                             Profile
-                                           </Link>
-                                         </li>
-                                         <li>
-                                           <Link
-                                             to={"/signin"}
-                                             className="cursor-pointer bg-stone-900 font-semibold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
-                                           >
-                                             Add another User
-                                           </Link>
-                                         </li>
-                                         <li>
-                                           <a
-                                             onClick={SignOut}
-                                             className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
-                                           >
-                                             Sign Out
-                                           </a>
-                                         </li>
-                                       </ul>
+                      <li>
+                        <Link
+                          to={"/profile"}
+                          className="cursor-pointer rounded-t bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                        >
+                          Profile
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          to={"/signin"}
+                          className="cursor-pointer bg-stone-900 font-semibold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                        >
+                          Add another User
+                        </Link>
+                      </li>
+                      <li>
+                        <a
+                          onClick={SignOut}
+                          className="cursor-pointer rounded-b bg-stone-900 font-bold hover:border-l-4 hover:bg-gradient-to-r from-[#ff000056] border-red-800 py-2 px-4 block whitespace-no-wrap transition ease-in-out delay-150"
+                        >
+                          Sign Out
+                        </a>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>

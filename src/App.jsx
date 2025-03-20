@@ -27,7 +27,10 @@ import Table from "./Pages/Table";
 import AdminNav from './components/AdminNav';
 import UserList from './components/UserList';
 import BannedAccount from "./components/BannedAccount";
-
+import SubscriptionPlans from "./Pages/subscription-plans/SubscriptionPlans";
+import PremiumUserManagement from "./Pages/admin/PremiumUserManagement";
+import { Toaster } from "react-hot-toast";
+import NotificationsScreen from "./Pages/notifications/NotificationsScreen";
 function App() {
   const { User, setUser } = useContext(AuthContext);
   useEffect(() => {
@@ -42,6 +45,15 @@ function App() {
 
   return (
     <div className="body">
+      <Toaster
+        toastOptions={{
+          style: {
+            padding: "1.5rem",
+            backgroundColor: "##f4fff4",
+            borderLeft: "6px solid green",
+          },
+        }}
+      />
       {User?.email === "admin@gmail.com" ? <AdminNav /> : User ? <Navbar></Navbar> : <NavbarWithoutUser></NavbarWithoutUser>}
       <Suspense replace fallback={<Loading />}>
         <Routes>
@@ -52,25 +64,27 @@ function App() {
               <Route path="/series" element={<Series />} />
               <Route path="/search" element={<Search />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/notification" element={<NotificationsScreen />} />
               <Route path="/mylist" element={<MyList />} />
               <Route path="/liked" element={<LikedMovies />} />
               <Route path="/history" element={<History />} />
-              <Route path="/payment" element={<PaymentScreen />} />
+              <Route path="/payment" element={<SubscriptionPlans />} />
               <Route path="/play/:id" element={<Play />} />
             </>
           ) : null}
           <Route
             path="/admin/*"
             element={
-                <>
-                  <Routes>
-                    <Route path="/upload" element={<VideoUploadForm />} />
-                    <Route path="/upload/:videoId" element={<VideoUploadForm />} />
-                    <Route path="/videos" element={<Table />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/users" element={<UserList />} />
-                  </Routes>
-                </>
+              <>
+                <Routes>
+                  <Route path="/upload" element={<VideoUploadForm />} />
+                  <Route path="/upload/:videoId" element={<VideoUploadForm />} />
+                  <Route path="/videos" element={<Table />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/users" element={<UserList />} />
+                  <Route path="/premiumUsers" element={<PremiumUserManagement />} />
+                </Routes>
+              </>
             }
           />
           <Route path="/signin" element={<SignIn />} />

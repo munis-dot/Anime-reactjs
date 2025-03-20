@@ -9,15 +9,15 @@ import { db } from "@/Firebase/FirebaseConfig";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const PaymentScreen = () => {
+const PaymentScreen = ({ amount }) => {
     const [isOpen, setIsOpen] = useState(true);
-    const amount = 600;
+
     const { User } = useContext(AuthContext);
     const navigation = useNavigate();
 
-    useEffect(()=>{
-        if(!isOpen) navigation(-1)
-    },[isOpen])
+    useEffect(() => {
+        if (!isOpen) navigation(-1)
+    }, [isOpen])
     const paynow = () => {
         setDoc(
             doc(db, "Users", User.uid),

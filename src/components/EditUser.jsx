@@ -10,8 +10,7 @@ const EditUser = ({ user, onUpdate, onClose }) => {
     email: user.email || '',
     phone: user.phone || '',
     age: user.age || '',
-    gender: user.gender || '',
-    premium: user.premium ?? false,
+    gender: user.gender || ''
   });
 
   const handleChange = (e) => {
@@ -22,12 +21,6 @@ const EditUser = ({ user, onUpdate, onClose }) => {
     }));
   };
 
-  const handleSwitchChange = (checked) => {
-    setFormData(prev => ({
-      ...prev,
-      premium: checked
-    }));
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -63,18 +56,6 @@ const EditUser = ({ user, onUpdate, onClose }) => {
             </div>
           ))}
           
-          {/* Add Premium Switch */}
-          <div className="flex items-center justify-between space-y-2">
-            <Label htmlFor="premium" className="text-sm font-medium text-zinc-400">
-              Premium Status
-            </Label>
-            <Switch
-              id="premium"
-              checked={formData.premium}
-              onCheckedChange={handleSwitchChange}
-              className="data-[state=checked]:bg-green-500"
-            />
-          </div>
         </form>
       </div>
 

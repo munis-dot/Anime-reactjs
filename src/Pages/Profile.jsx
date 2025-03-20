@@ -27,15 +27,13 @@ function Profile() {
   const [profilePic, setProfilePic] = useState("");
   const [isUserNameChanged, setIsUserNameChanged] = useState(false);
   const [userName, setUserName] = useState("");
-  const [isMyListUpdated, setisMyListUpdated] = useState(false);
-  const [premium, setPremium] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
+
   useEffect(() => {
     if (User != null) {
       setProfilePic(User.photoURL);
       fetchDocumentById('Users', User.uid).then((res) => {
-        console.log(res)
         setFormData(res)
       })
     }
@@ -88,6 +86,23 @@ function Profile() {
         alert(error.message);
       });
   };
+
+  const cancelPremium = async () => {
+    try {
+      const userRef = doc(db, 'Users', User.Uid);
+      await updateDoc(userRef, {
+        premium: false,
+        planExpiry: null,
+        currentPlan: null
+      });
+      fetchDocumentById('Users', User.uid).then((res) => {
+        setFormData(res)
+      })
+      toast.success('Subscription Cancelled Successfully');
+    } catch (error) {
+      console.error("Error canceling premium:", error);
+    }
+  }
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -187,10 +202,19 @@ function Profile() {
                 </h1>
                 <h1 className="text-white text-xl p-2 rounded mb-4 flex gap-2 items-center">
                   <img className="w-10 h-10 rounded-md cursor-pointer" src={premiumUrl}></img>
-                  <div>{formData.premium ? 'You\'re the Premium Member' : <button
-                    onClick={() => navigate("/payment")}
-                    className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
-                  >Subscribe life time access</button>}</div>
+                  <div>{formData.premium ?
+                    <>
+                      <div>{`You\'re the ${formData.currentPlan} Premium Member`}</div>
+                      <span>Expiry on {formData.planExpiry}</span>
+                      <button
+                        onClick={() => cancelPremium()}
+                        className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
+                      >Cancel</button>
+                    </>
+                    : <button
+                      onClick={() => navigate("/payment")}
+                      className="flex items-center bg-red-700 text-white font-medium sm:font-bold text-xs px-10 md:px-16 md:text-xl  py-3 rounded shadow hover:shadow-lg hover:bg-white hover:text-red-700 outline-none focus:outline-none mr-3 mb-1 ease-linear transition-all duration-150"
+                    >Subscribe Now</button>}</div>
                 </h1>
                 <hr className="h-px bg-gray-500 border-0 mb-4 md:mb-10 dark:bg-gray-700"></hr>
 

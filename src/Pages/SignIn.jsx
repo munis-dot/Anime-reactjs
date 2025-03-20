@@ -10,7 +10,7 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { setDoc, doc, getDoc } from "firebase/firestore";
+import { setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../Firebase/FirebaseConfig";
 import { AuthContext } from "../Context/UserContext";
 
@@ -26,6 +26,31 @@ function SignIn() {
   const [ErrorMessage, setErrorMessage] = useState("");
   const [loader, setLoader] = useState(false);
 
+  function isExpired(dateString) {
+    const givenDate = new Date(dateString);
+    const currentDate = new Date();
+
+    // Set currentDate time to 00:00:00 to compare only dates
+    currentDate.setHours(0, 0, 0, 0);
+    givenDate.setHours(0, 0, 0, 0);
+
+    return givenDate < currentDate; // Returns true if expired, false otherwise
+  }
+  const handleExpiry = async (data) => {
+    if (data?.planExpiry && isExpired(data.planExpiry)) {
+      try {
+        const userRef = doc(db, 'Users', data.Uid);
+        await updateDoc(userRef, {
+          premium: false,
+          planExpiry: null,
+          currentPlan: null
+        });
+      } catch (error) {
+        console.error("Error canceling premium:", error);
+      }
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoader(true);
@@ -35,10 +60,9 @@ function SignIn() {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log(user);
         getDoc(doc(db, "Users", user.uid)).then((result) => {
           if (result.exists()) {
-            // console.log(result.data())
+            handleExpiry(result.data())
           }
           else {
             signOut(auth);
@@ -46,9 +70,9 @@ function SignIn() {
           }
         });
         if (user != null) {
-          if(user.email === "admin@gmail.com"){
+          if (user.email === "admin@gmail.com") {
             navigate("/admin/dashboard");
-          }else{
+          } else {
             navigate("/");
           }
         }
@@ -82,6 +106,11 @@ function SignIn() {
           },
           { merge: true }
         ).then(() => {
+          getDoc(doc(db, "Users", user.uid)).then((result) => {
+            if (result.exists()) {
+              handleExpiry(result.data())
+            }
+          })
           getDoc(doc(db, "MyList", user.uid)).then((result) => {
             if (result.exists()) {
               // Data exist in MyList section for this user
@@ -236,8 +265,8 @@ function SignIn() {
                   <button
                     type="submit"
                     className={`w-full text-white ${loader
-                        ? `bg-stone-700`
-                        : `bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-primary-300`
+                      ? `bg-stone-700`
+                      : `bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-primary-300`
                       } transition ease-in-out font-medium rounded-sm text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800`}
                   >
                     {loader ? <ClipLoader color="#ff0000" /> : `Sign in`}
@@ -245,8 +274,8 @@ function SignIn() {
                   <button
                     onClick={loginWithGoogle}
                     className={`flex justify-center items-center w-full text-white ${loader
-                        ? `bg-stone-700`
-                        : `bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300`
+                      ? `bg-stone-700`
+                      : `bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-primary-300`
                       } transition ease-in-out font-medium rounded-sm text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:focus:ring-primary-800`}
                   >
                     {loader ? (

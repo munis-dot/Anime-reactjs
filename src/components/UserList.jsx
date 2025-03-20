@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Input } from "./ui/input";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, Bell } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import ViewUser from "./ViewUser";
 import EditUser from "./EditUser";
@@ -24,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import NotificationPopup from "./NotificationPopup";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -31,6 +32,7 @@ const UserList = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showComponent, setShowComponent] = useState(null); // 'view' or 'edit'
+  const [notificationUser, setNotificationUser] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -63,8 +65,8 @@ const UserList = () => {
         gender: updatedUser.gender,
         premium: updatedUser.premium
       });
-      
-      setUsers(users.map(user => 
+
+      setUsers(users.map(user =>
         user.id === updatedUser.id ? updatedUser : user
       ));
       setEditingUser(null);
@@ -111,7 +113,7 @@ const UserList = () => {
 
   return (
     <div className="h-screen w-full p-4">
-       <Toaster
+      <Toaster
         toastOptions={{
           style: {
             padding: "1.5rem",
@@ -138,7 +140,7 @@ const UserList = () => {
             </TableHeader>
             <TableBody>
               {users.map((user) => (
-                <TableRow 
+                <TableRow
                   key={user.id}
                   className="border-zinc-800 hover:bg-zinc-800/50 transition-colors"
                 >
@@ -147,11 +149,10 @@ const UserList = () => {
                   <TableCell className="text-zinc-300">{user.email || 'N/A'}</TableCell>
                   <TableCell className="text-zinc-300">{user.phone || 'N/A'}</TableCell>
                   <TableCell className="text-center">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      user.premium 
+                    <span className={`px-2 py-1 rounded-full text-xs ${user.premium
                         ? 'bg-green-500/20 text-green-400'
                         : 'bg-zinc-500/20 text-zinc-400'
-                    }`}>
+                      }`}>
                       {user.premium ? 'Yes' : 'No'}
                     </span>
                   </TableCell>
@@ -174,6 +175,14 @@ const UserList = () => {
                         onClick={() => handleEditClick(user)}
                       >
                         <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white border-0"
+                        onClick={() => setNotificationUser(user)}
+                      >
+                        <Bell className="h-4 w-4" />
                       </Button>
                       <Dialog>
                         <DialogTrigger asChild>
@@ -214,7 +223,7 @@ const UserList = () => {
         {/* Replace bottom components with overlays */}
         {showComponent === 'view' && selectedUser && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <ViewUser 
+            <ViewUser
               user={selectedUser}
               onDelete={deleteUser}
               onEdit={handleEditClick}
@@ -223,9 +232,16 @@ const UserList = () => {
           </div>
         )}
 
+        <NotificationPopup
+          isOpen={!!notificationUser}
+          onClose={() => setNotificationUser(null)}
+          userId={notificationUser?.id}
+          userName={notificationUser?.displayName}
+        />
+
         {showComponent === 'edit' && selectedUser && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <EditUser 
+            <EditUser
               user={selectedUser}
               onUpdate={handleEdit}
               onClose={handleClose}

@@ -1,0 +1,95 @@
+.subscription-container {
+  background-color: #141414;
+  min-height: 100vh;
+  padding: 50px 20px;
+  color: white;
+}
+
+.subscription-container h1 {
+  text-align: center;
+  margin-bottom: 50px;
+  font-size: 2.5rem;
+}
+
+.plans-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.plan-card {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 30px;
+  width: 300px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.plan-card:hover {
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.plan-card h2 {
+  text-align: center;
+  color: #e50914;
+  margin-bottom: 20px;
+}
+
+.price {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.currency {
+  font-size: 20px;
+  vertical-align: top;
+}
+
+.amount {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.period {
+  font-size: 16px;
+  color: #999;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.features li {
+  margin-bottom: 10px;
+  padding-left: 25px;
+  position: relative;
+}
+
+.features li::before {
+  content: '✓';
+  color: #e50914;
+  position: absolute;
+  left: 0;
+}
+
+.subscribe-btn {
+  width: 100%;
+  padding: 15px;
+  background-color: #e50914;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.subscribe-btn:hover {
+  background-color: #f40612;
+}
