@@ -89,7 +89,7 @@ function Profile() {
 
   const cancelPremium = async () => {
     try {
-      const userRef = doc(db, 'Users', User.Uid);
+      const userRef = doc(db, 'Users', User.uid);
       await updateDoc(userRef, {
         premium: false,
         planExpiry: null,

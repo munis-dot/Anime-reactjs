@@ -5,6 +5,7 @@ import { AuthContext } from '@/Context/UserContext';
 import toast, { Toaster } from "react-hot-toast";
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/Firebase/FirebaseConfig';
+import { useNavigate } from 'react-router-dom';
 
 const SubscriptionPlans = () => {
   const plans = [
@@ -30,9 +31,10 @@ const SubscriptionPlans = () => {
     setFlag({ open: false, amount: 0 })
   }, []);
 
-   const { User } = useContext(AuthContext);
- 
-  console.log(User)
+  const { User } = useContext(AuthContext);
+
+  const navigation = useNavigate();
+
   function getFutureDate(option) {
     const currentDate = new Date();
     switch (option) {
@@ -57,7 +59,7 @@ const SubscriptionPlans = () => {
   }, []);
 
   const handlePayment = (price, plan) => {
-    
+
     const options = {
       key: "rzp_test_CqgPJqGRPp5PWg",
       amount: price,
@@ -73,6 +75,7 @@ const SubscriptionPlans = () => {
           planExpiry: getFutureDate(plan),
           currentPlan: plan
         });
+        navigation('/profile');
       },
       prefill: {
         name: User.displayName,
